@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SMS Gateway SaaS — Cloud Cellular Messaging Portal</title>
+  <meta name="description" content="Production-ready Multi-Tenant SMS Gateway platform powered by SMS Gateway for Android™. Send, receive, and manage SMS via real Android devices.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Ambient background glow elements -->
+  <div class="glow-orb orb-primary"></div>
+  <div class="glow-orb orb-secondary"></div>
+  <div class="grid-overlay"></div>
+
+  <!-- Toast Notification Container -->
+  <div id="toast-container" class="toast-container"></div>
+
+  <!-- Main Application Wrapper -->
+  <div id="app" class="app-wrapper">
+
+    <!-- ========================================================
+         VIEW 1: AUTHENTICATION (LOGIN & 2FA OTP)
+         ======================================================== -->
+    <section id="auth-view" class="auth-section">
+      <div class="auth-container">
+        <!-- Brand Header -->
+        <div class="brand-header">
+          <div class="brand-badge">
+            <span class="status-dot pulsing"></span>
+            <span>Cellular Gateway Active</span>
+          </div>
+          <div class="brand-logo">
+            <div class="logo-icon">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                <path d="M12 7v6"></path>
+                <path d="M9 10h6"></path>
+              </svg>
+            </div>
+            <h1>SMSGate<span>SaaS</span></h1>
+          </div>
+          <p class="brand-subtitle">High-throughput SMS infrastructure powered by Android™ cellular hardware</p>
+        </div>
+
+        <!-- Glassmorphism Auth Card -->
+        <div class="auth-card glass-panel">
+          <!-- Step 1: Email & Password -->
+          <div id="login-step-1" class="auth-step active">
+            <div class="step-header">
+              <h2>Sign in to Dashboard</h2>
+              <p>Enter your account credentials to begin authentication</p>
+            </div>
+
+            <form id="login-form" class="auth-form" autocomplete="on">
+              <div class="form-group">
+                <label for="email-input">Email Address</label>
+                <div class="input-wrapper">
+                  <svg class="input-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="2" y="4" width="20" height="16" rx="2"></rect>
+                    <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"></path>
+                  </svg>
+                  <input 
+                    type="email" 
+                    id="email-input" 
+                    name="email" 
+                    value="musamwange2@gmail.com" 
+                    placeholder="name@company.com" 
+                    required 
+                  />
+                </div>
+              </div>
+
+              <div class="form-group">
+                <div class="form-label-row">
+                  <label for="password-input">Password</label>
+                  <span class="preset-hint">Preset: 23748124</span>
+                </div>
+                <div class="input-wrapper">
+                  <svg class="input-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                    <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                  </svg>
+                  <input 
+                    type="password" 
+                    id="password-input" 
+                    name="password" 
+                    value="23748124" 
+                    placeholder="••••••••" 
+                    required 
+                  />
+                  <button type="button" id="toggle-password-btn" class="icon-btn" aria-label="Toggle password visibility">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"></path>
+                      <circle cx="12" cy="12" r="3"></circle>
+                    </svg>
+                  </button>
+                </div>
+              </div>
+
+              <div class="alert-box info-alert">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <line x1="12" y1="8" x2="12" y2="12"></line>
+                  <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                </svg>
+                <span>Security Check: A 6-digit OTP will be dispatched via SMS to your verified phone number <strong>0748329410</strong>.</span>
+              </div>
+
+              <button type="submit" id="btn-login" class="btn btn-primary btn-block">
+                <span class="btn-text">Proceed to SMS Verification</span>
+                <span class="btn-spinner hidden"></span>
+              </button>
+            </form>
+          </div>
+
+          <!-- Step 2: 6-Digit SMS OTP Verification -->
+          <div id="login-step-2" class="auth-step">
+            <div class="step-header">
+              <div class="otp-badge-icon">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect>
+                  <line x1="12" y1="18" x2="12.01" y2="18"></line>
+                </svg>
+              </div>
+              <h2>SMS Verification Code</h2>
+              <p>We sent a 6-digit verification code via cellular SMS to <strong id="otp-phone-display">+254 748 *** 410</strong></p>
+            </div>
+
+            <!-- Real-time Gateway Dispatch Monitor Box -->
+            <div id="gateway-dispatch-box" class="gateway-dispatch-box">
+              <div class="dispatch-header">
+                <span class="pulse-indicator"></span>
+                <span>Gateway Event: SMS Dispatched</span>
+              </div>
+              <div class="dispatch-body">
+                <p id="dispatch-msg-preview">Dispatched via Android Gateway [SIM Slot 0]</p>
+              </div>
+            </div>
+
+            <form id="otp-form" class="auth-form">
+              <div class="form-group">
+                <label for="otp-input-1">Enter 6-digit code</label>
+                <div class="otp-inputs-grid">
+                  <input type="text" maxlength="1" class="otp-digit" id="otp-1" data-index="1" inputmode="numeric" autocomplete="one-time-code" autofocus />
+                  <input type="text" maxlength="1" class="otp-digit" id="otp-2" data-index="2" inputmode="numeric" />
+                  <input type="text" maxlength="1" class="otp-digit" id="otp-3" data-index="3" inputmode="numeric" />
+                  <input type="text" maxlength="1" class="otp-digit" id="otp-4" data-index="4" inputmode="numeric" />
+                  <input type="text" maxlength="1" class="otp-digit" id="otp-5" data-index="5" inputmode="numeric" />
+                  <input type="text" maxlength="1" class="otp-digit" id="otp-6" data-index="6" inputmode="numeric" />
+                </div>
+              </div>
+
+              <div class="otp-timer-row">
+                <span id="otp-timer-text">Code expires in <strong id="timer-count">05:00</strong></span>
+                <button type="button" id="btn-resend-otp" class="link-btn">Resend SMS</button>
+              </div>
+
+              <button type="submit" id="btn-verify-otp" class="btn btn-primary btn-block">
+                <span class="btn-text">Verify & Access Dashboard</span>
+                <span class="btn-spinner hidden"></span>
+              </button>
+
+              <button type="button" id="btn-back-to-login" class="btn btn-secondary btn-block">
+                ← Back to Login
+              </button>
+            </form>
+          </div>
+        </div>
+
+        <div class="auth-footer">
+          <p>SMS Gateway for Android™ Core Engine • Private Enterprise Edition</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================================
+         VIEW 2: SAAS DASHBOARD (SHOWN AFTER AUTHENTICATION)
+         ======================================================== -->
+    <main id="dashboard-view" class="dashboard-section hidden">
+      <!-- Dashboard Top Navigation Bar -->
+      <header class="dash-navbar glass-panel">
+        <div class="nav-brand">
+          <div class="logo-icon small">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+            </svg>
+          </div>
+          <span class="brand-title">SMSGate<span>SaaS</span></span>
+        </div>
+
+        <div class="nav-metrics">
+          <div class="metric-pill">
+            <span class="pill-label">SMS Credits</span>
+            <span id="user-credits" class="pill-value">1,000</span>
+          </div>
+          <div class="metric-pill">
+            <span class="pill-label">Gateway</span>
+            <span class="pill-status online">ONLINE</span>
+          </div>
+        </div>
+
+        <div class="nav-user">
+          <div class="user-avatar" id="user-avatar-initials">MM</div>
+          <div class="user-details">
+            <span id="user-email-display" class="user-email">musamwange2@gmail.com</span>
+            <span id="user-phone-display" class="user-phone">+254748329410</span>
+          </div>
+          <button type="button" id="btn-logout" class="btn btn-outline-danger btn-sm">
+            Sign out
+          </button>
+        </div>
+      </header>
+
+      <!-- Dashboard Main Grid Content -->
+      <div class="dashboard-content">
+
+        <!-- Stat Cards Row -->
+        <div class="stats-grid">
+          <div class="stat-card glass-panel">
+            <div class="stat-icon-wrapper blue">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="22" y1="2" x2="11" y2="13"></line>
+                <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+              </svg>
+            </div>
+            <div class="stat-info">
+              <span class="stat-label">Total SMS Dispatched</span>
+              <h3 id="stat-total-sent" class="stat-value">1</h3>
+            </div>
+          </div>
+
+          <div class="stat-card glass-panel">
+            <div class="stat-icon-wrapper green">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                <polyline points="22 4 12 14.01 9 11.01"></polyline>
+              </svg>
+            </div>
+            <div class="stat-info">
+              <span class="stat-label">Delivery Success Rate</span>
+              <h3 class="stat-value">100%</h3>
+            </div>
+          </div>
+
+          <div class="stat-card glass-panel">
+            <div class="stat-icon-wrapper purple">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="5" y="2" width="14" height="20" rx="2"></rect>
+                <line x1="12" y1="18" x2="12.01" y2="18"></line>
+              </svg>
+            </div>
+            <div class="stat-info">
+              <span class="stat-label">Active Gateway Devices</span>
+              <h3 id="stat-devices-count" class="stat-value">1 Online</h3>
+            </div>
+          </div>
+
+          <div class="stat-card glass-panel">
+            <div class="stat-icon-wrapper amber">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+              </svg>
+            </div>
+            <div class="stat-info">
+              <span class="stat-label">Carrier Rate Limit</span>
+              <h3 class="stat-value">20 SMS / min</h3>
+            </div>
+          </div>
+        </div>
+
+        <!-- Two Column Main Workspace -->
+        <div class="workspace-grid">
+          <!-- Left Column: Send SMS Form -->
+          <div class="workspace-card glass-panel">
+            <div class="card-header">
+              <h2>Send Quick SMS</h2>
+              <span class="badge badge-accent">Live Cellular Dispatch</span>
+            </div>
+
+            <form id="dash-send-form" class="composer-form">
+              <div class="form-group">
+                <label for="compose-to">Recipient Phone Number (E.164)</label>
+                <div class="input-wrapper">
+                  <svg class="input-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
+                  </svg>
+                  <input type="text" id="compose-to" placeholder="+254748329410 or 0748329410" value="+254748329410" required />
+                </div>
+              </div>
+
+              <div class="form-row">
+                <div class="form-group half">
+                  <label for="compose-sim">SIM Card Slot</label>
+                  <select id="compose-sim" class="custom-select">
+                    <option value="0">SIM 1 (T-Mobile / Primary)</option>
+                    <option value="1">SIM 2 (Secondary Carrier)</option>
+                  </select>
+                </div>
+                <div class="form-group half">
+                  <label for="compose-from">Sender ID (Optional)</label>
+                  <input type="text" id="compose-from" placeholder="SmsGate" value="SmsGate" />
+                </div>
+              </div>
+
+              <div class="form-group">
+                <div class="form-label-row">
+                  <label for="compose-text">Message Content</label>
+                  <span id="char-counter" class="char-counter">0 / 160 chars (1 segment)</span>
+                </div>
+                <textarea id="compose-text" rows="4" placeholder="Type your SMS message here..." required>Hello from your self-hosted SMS Gateway SaaS!</textarea>
+              </div>
+
+              <div class="sms-meta-breakdown">
+                <div class="meta-item">
+                  <span class="meta-label">Encoding:</span>
+                  <span id="meta-encoding" class="meta-val">GSM-7</span>
+                </div>
+                <div class="meta-item">
+                  <span class="meta-label">Total Segments:</span>
+                  <span id="meta-segments" class="meta-val">1 SMS</span>
+                </div>
+                <div class="meta-item">
+                  <span class="meta-label">Credit Cost:</span>
+                  <span id="meta-credits" class="meta-val">1 Credit</span>
+                </div>
+              </div>
+
+              <button type="submit" id="btn-send-sms" class="btn btn-primary btn-block">
+                <span class="btn-text">Dispatch SMS Message</span>
+                <span class="btn-spinner hidden"></span>
+              </button>
+            </form>
+          </div>
+
+          <!-- Right Column: Active Devices & Quick API Info -->
+          <div class="workspace-sidebar">
+            <!-- Connected Devices Box -->
+            <div class="workspace-card glass-panel">
+              <div class="card-header">
+                <h2>Android Devices Pool</h2>
+                <button type="button" id="btn-refresh-devices" class="icon-btn-sm" title="Refresh devices">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"></path>
+                    <path d="M21 3v5h-5"></path>
+                    <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"></path>
+                    <path d="M8 16H3v5"></path>
+                  </svg>
+                </button>
+              </div>
+
+              <div id="devices-list" class="devices-list">
+                <!-- Populated via JavaScript -->
+              </div>
+            </div>
+
+            <!-- API Credentials Card -->
+            <div class="workspace-card glass-panel">
+              <div class="card-header">
+                <h2>Developer API Access</h2>
+              </div>
+              <div class="api-key-box">
+                <span class="key-label">Secret API Key (Live)</span>
+                <div class="key-display">
+                  <code id="api-key-display">ak_live_demo123</code>
+                  <button type="button" id="btn-copy-key" class="btn-copy" title="Copy Key">Copy</button>
+                </div>
+                <p class="key-hint">Include in header: <code>Authorization: Bearer ak_live_demo123</code></p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Bottom Row: Real-time Message Log Table -->
+        <div class="workspace-card glass-panel logs-card">
+          <div class="card-header">
+            <h2>Recent Message Activity</h2>
+            <div class="table-actions">
+              <button type="button" id="btn-refresh-logs" class="btn btn-secondary btn-sm">
+                Refresh Logs
+              </button>
+            </div>
+          </div>
+
+          <div class="table-responsive">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Message ID</th>
+                  <th>Recipient</th>
+                  <th>Content Preview</th>
+                  <th>Segments</th>
+                  <th>Status</th>
+                  <th>Timestamp</th>
+                </tr>
+              </thead>
+              <tbody id="messages-table-body">
+                <!-- Dynamically populated -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+    </main>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,25 @@
+## SMS Gateway for Android™ Private Server Configuration
+database:
+  host: 127.0.0.1
+  port: 3307
+  user: sms
+  password: smspassword
+  database: sms
+  timezone: UTC
+  debug: false
+  max_open_conns: 4
+  max_idle_conns: 2
+
+gateway:
+  mode: private
+  private_token: secret_gateway_token_2026
+
+http:
+  listen: 0.0.0.0:3005
+  proxies:
+    - "127.0.0.1"
+    - "192.168.1.0/24"
+  api:
+    path: /api
+  openapi:
+    enabled: true

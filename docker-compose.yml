@@ -1,0 +1,101 @@
+version: '3.8'
+
+services:
+  # 1. MariaDB for Android SMS Gateway Private Server
+  db:
+    image: mariadb:lts
+    container_name: smsgate-mariadb
+    restart: unless-stopped
+    environment:
+      - MYSQL_ROOT_PASSWORD=rootpassword
+      - MYSQL_DATABASE=sms
+      - MYSQL_USER=sms
+      - MYSQL_PASSWORD=smspassword
+      - MARIADB_AUTO_UPGRADE=1
+    volumes:
+      - mariadb_data:/var/lib/mysql
+    ports:
+      - "3307:3306"
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # 2. Official Android SMS Gateway Server
+  smsgate-server:
+    image: ghcr.io/android-sms-gateway/server:latest
+    container_name: smsgate-backend
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    network_mode: host
+    volumes:
+      - ./config.yml:/app/config.yml:ro
+    environment:
+      - CONFIG_PATH=/app/config.yml
+      - HTTP__LISTEN=0.0.0.0:3005
+
+  # 3. Official Android SMS Gateway Background Maintenance Worker
+  smsgate-worker:
+    image: ghcr.io/android-sms-gateway/server:latest
+    container_name: smsgate-worker
+    restart: unless-stopped
+    command: ["/app/app", "worker"]
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - ./config.yml:/app/config.yml:ro
+    environment:
+      - CONFIG_PATH=/app/config.yml
+
+  # 4. Official Email-to-SMS Bridge (SMTP Server on Port 2525/587)
+  email-to-sms:
+    image: ghcr.io/android-sms-gateway/email-to-sms:latest
+    container_name: smsgate-email-bridge
+    restart: unless-stopped
+    ports:
+      - "2525:2525"
+      - "3002:3000" # Health/metrics
+    environment:
+      - SMTP__HOST=0.0.0.0
+      - SMTP__PORT=2525
+      - SMTP__DOMAIN=sms-gateway.local
+      - SMSGATE__URL=http://smsgate-server:3000/api/3rdparty/v1
+
+  # 5. Redis for BullMQ Job Queue & Carrier Rate Limiting
+  redis:
+    image: redis:7-alpine
+    container_name: smsgate-redis
+    restart: unless-stopped
+    ports:
+      - "6380:6379"
+    volumes:
+      - redis_data:/data
+
+  # 6. Scalable Multi-Tenant SaaS API Layer
+  saas-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: smsgate-saas-api
+    restart: unless-stopped
+    depends_on:
+      - redis
+      - smsgate-server
+    ports:
+      - "4000:4000"
+    environment:
+      - PORT=4000
+      - NODE_ENV=production
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - GATEWAY_MODE=smsgate
+      - SMSGATE_SERVER_URL=http://smsgate-server:3000
+      - SMSGATE_PRIVATE_TOKEN=secret_gateway_token_2026
+
+volumes:
+  mariadb_data:
+  redis_data:
